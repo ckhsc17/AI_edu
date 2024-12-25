@@ -12,6 +12,9 @@ import '../providers/models_provider.dart';
 import '../services/assets_manager.dart';
 import '../widgets/text_widget.dart';
 
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -96,6 +99,28 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
+                    // Add a Image Picker
+                    IconButton(
+                      onPressed: () async { // 先寫死，之後可以函式化放在services.dart
+                        // assert(widget.object != null, 'An object needs to be selected before uploading an image.');
+                        final image = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                          maxWidth: 1980,
+                          maxHeight: 1980,
+                        );
+                        if (image == null) return;
+                        /*
+                        await Services.showImagePicker(
+                            context: context,
+                            modelsProvider: modelsProvider,
+                            chatProvider: chatProvider);
+                        */
+                      },
+                      icon: const Icon(
+                        Icons.image,
+                        color: Colors.white,
+                      ),
+                    ), 
                     Expanded(
                       child: TextField(
                         focusNode: focusNode,

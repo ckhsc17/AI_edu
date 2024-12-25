@@ -2,17 +2,21 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:chatgpt_course/constants/api_consts.dart';
+//import 'package:chatgpt_course/constants/api_consts.dart';
 import 'package:chatgpt_course/models/chat_model.dart';
 import 'package:chatgpt_course/models/models_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
+  static final String BASE_URL = dotenv.env['BASE_URL'] ?? '';
+  static final String OPENAI_API_KEY = dotenv.env['OPENAI_API_KEY'] ?? '';
+
   static Future<List<ModelsModel>> getModels() async {
     try {
       var response = await http.get(
         Uri.parse("$BASE_URL/models"),
-        headers: {'Authorization': 'Bearer $API_KEY'},
+        headers: {'Authorization': 'Bearer $OPENAI_API_KEY'},
       );
 
       Map jsonResponse = jsonDecode(response.body);
@@ -42,12 +46,12 @@ class ApiService {
       var response = await http.post(
         Uri.parse("$BASE_URL/chat/completions"),
         headers: {
-          'Authorization': 'Bearer $API_KEY',
+          'Authorization': 'Bearer $OPENAI_API_KEY',
           "Content-Type": "application/json"
         },
         body: jsonEncode(
           {
-            "model": modelId,
+            "model": "gpt-4o-mini", //modelId這邊先寫死 gpt-3.5-turbo
             "messages": [
               {
                 "role": "user",
@@ -90,7 +94,7 @@ class ApiService {
       var response = await http.post(
         Uri.parse("$BASE_URL/completions"),
         headers: {
-          'Authorization': 'Bearer $API_KEY',
+          'Authorization': 'Bearer $OPENAI_API_KEY',
           "Content-Type": "application/json"
         },
         body: jsonEncode(

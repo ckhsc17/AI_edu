@@ -1,4 +1,5 @@
 import 'package:chatgpt_course/providers/models_provider.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,8 +7,21 @@ import 'constants/constants.dart';
 import 'providers/chats_provider.dart';
 import 'screens/chat_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  String envPath = "${Directory.current.path}/.env";
+  log("Loading from: $envPath"); // 調試用
+  try {
+    await dotenv.load(fileName: "/Users/bowen/ChatGPT_flutter_course/.env");
+    log("dotenv.env['BASE_URL'] ${dotenv.env['BASE_URL']}");
+    runApp(const MyApp());
+  } catch (e) {
+    log("Failed to load .env file: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
