@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 //import 'package:chatgpt_course/constants/api_consts.dart';
 import 'package:chatgpt_course/models/chat_model.dart';
@@ -85,6 +86,53 @@ class ApiService {
       rethrow;
     }
   }
+
+  // Send Image Using ChatGPT API
+  static Future<List<ChatModel>> sendMessageAndImageGPT({
+    required String message,
+    required Uint8List image,
+    required String modelId,
+  }) async {
+    try {
+      log("modelId $modelId");
+      var response = await http.post(
+        Uri.parse("$BASE_URL/chat/completions"),
+        headers: {
+          'Authorization': 'Bearer $OPENAI_API_KEY',
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(
+          {
+            "model": "gpt-4o-mini", //modelId這邊先寫死 gpt-4o-mini
+            "messages": [
+              {"role": "user", "content": message},
+              {"role": "user", "content": "Image: $image"}
+            ]
+          },
+        ),
+      );
+
+      Map jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      if (jsonResponse['error'] != null) {
+        throw HttpException(jsonResponse['error']["message"]);
+      }
+      List<ChatModel> chatList = [];
+      if (jsonResponse["choices"].length > 0) {
+        chatList = List.generate(
+          jsonResponse["choices"].length,
+          (index) => ChatModel(
+            msg: jsonResponse["choices"][index]["message"]["content"],
+            chatIndex: 1,
+          ),
+        );
+      }
+      return chatList;
+    } catch (error) {
+      log("error $error");
+      rethrow;
+    }
+  }
+
 
   // Send Message fct
   static Future<List<ChatModel>> sendMessage(

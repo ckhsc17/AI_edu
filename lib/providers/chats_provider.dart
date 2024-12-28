@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
+import 'dart:typed_data';
 
 class ChatProvider with ChangeNotifier {
   List<ChatModel> chatList = [];
@@ -29,4 +30,16 @@ class ChatProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // send image
+  Future<void> sendImageAndGetAnswers(
+      {required String msg, required String chosenModelId, required Uint8List image}) async {
+    chatList.addAll(await ApiService.sendMessageAndImageGPT(
+      message: msg,
+      modelId: chosenModelId,
+      image: image,
+    ));
+    notifyListeners();
+  }
+
 }
