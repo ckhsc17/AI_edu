@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';  // Import for camera functionality
 import 'dart:typed_data';
 
 import '../providers/models_provider.dart';
@@ -95,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     IconButton(
                       onPressed: () => _pickImage(),
                       icon: const Icon(
-                        Icons.image,
+                        Icons.upload_file, //image
                         color: Colors.white,
                       ),
                     ),
@@ -218,8 +219,30 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _pickImage() async {
     log('Image Picker pressed');
+
+    // Show a dialog to choose between camera or gallery
+    final pickedSource = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select image source'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ImageSource.camera),
+            child: const Text('Camera'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
+            child: const Text('Gallery'),
+          ),
+        ],
+      ),
+    );
+
+    if (pickedSource == null) return;  // If no source was selected, return
+
+    // If the source is the camera, use ImagePicker for gallery or camera
     final image = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+      source: pickedSource,
       maxWidth: 1980,
       maxHeight: 1980,
     );
@@ -235,4 +258,27 @@ class _ChatScreenState extends State<ChatScreen> {
       _imageBytes = imageBytes;
     });
   }
+
+
+/* old without camera function
+  Future<void> _pickImage() async {
+    log('Image Picker pressed');
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery, //gallery
+      maxWidth: 1980,
+      maxHeight: 1980,
+    );
+
+    if (image == null) {
+      log("No image selected.");
+      return;
+    }
+
+    log("Image selected yeah.");
+    final imageBytes = await image.readAsBytes();
+    setState(() {
+      _imageBytes = imageBytes;
+    });
+  }
+  */
 }
